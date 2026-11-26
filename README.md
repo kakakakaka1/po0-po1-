@@ -27,6 +27,20 @@ https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/egern/po0-po1-firewa
 
 > Egern 没有 Surge 那种面板，加白结果只体现在通知里；成功状态只在出口 IP / 槽位变化时弹一次，失败每次都弹。
 
+### Egern 装了没反应？
+
+Egern 的 `schedule` 脚本靠系统后台唤醒，10 分钟一次并不准时；`network` 脚本只有切网才触发，**没有手动运行的按钮**。按这个顺序排查：
+
+1. **先确认参数**：工具 → 模块 → 点开模块 → 参数里 `tokens1` 是否真的填了。
+2. **看有没有「未配置 token」通知**：po1 脚本在 token 为空（或占位符没被替换）时会**弹一次**提示，之后静默。收到了 = 脚本在跑，问题在参数；一条都没有 = 脚本压根没被触发。
+3. **要立刻验证就装测试模块**（cron 每分钟，用完删掉）：
+
+```
+https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/egern/po1-test.yaml
+```
+
+4. 仍然没动静的话，检查 Egern 的 VPN 是否在运行、通知权限是否给了 Egern。
+
 ## 两套 API 的差异（实测）
 
 | | po0 | po1 |

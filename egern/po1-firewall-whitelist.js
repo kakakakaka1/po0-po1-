@@ -242,10 +242,30 @@ function describe(ctx, index, c) {
 
 export default async function (ctx) {
   try {
-    const tokens = parseTokens(ctx.env && ctx.env.tokens);
+    const raw = (ctx.env && ctx.env.tokens) || "";
+    const tokens = parseTokens(raw);
     if (tokens.length === 0) {
-      // po1 在模块里是可选功能：没填 tokens1 时静默退出，不弹通知，
-      // 否则只配了 po0 的人每 10 分钟被吵一次。
+      // po1 在模块里是可选功能，正常不打扰。但 Egern 没有 Surge 那种面板，
+      // 装了没反应时无法区分「脚本没触发」和「触发了但没参数」，所以这里
+      // 在原始值变化时提示一次（之后静默），用来定位问题。
+      const KEY = "po1_fw_nokey";
+      let seen = null;
+      try {
+        seen = ctx.storage.get(KEY);
+      } catch (e) {}
+      if (seen !== raw) {
+        try {
+          ctx.storage.set(KEY, raw);
+        } catch (e) {}
+        const hint = raw
+          ? "收到 tokens1 长度 " + raw.length + "，但没有 ctecsfw_ 开头的条目（占位符可能没被替换）"
+          : "tokens1 为空";
+        ctx.notify({
+          title: "po1 防火墙加白",
+          subtitle: "未配置 token（此提示只弹一次）",
+          body: hint + "。在模块参数 tokens1 填入 ctecsfw_ token，多个用英文逗号分割",
+        });
+      }
       return;
     }
 

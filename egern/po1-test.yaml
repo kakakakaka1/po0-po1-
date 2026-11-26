@@ -1,0 +1,28 @@
+name: po1 加白·测试（每分钟）
+description: 仅用于排查「装了没反应」的临时模块。每分钟跑一次 po1 加白脚本，跑完就能看到通知，用完请删除。正式使用请装 po0-po1-firewall-whitelist.yaml。
+author: 临时测试用
+homepage: https://po0fw.uuuz.de/
+
+# 安装后填入 tokens1（ctecsfw_ 开头的 token），保存后 1 分钟内应收到通知。
+compat_arguments:
+  tokens1: ""
+
+rules:
+  - domain_suffix:
+      match: guguyun.com
+      policy: DIRECT
+
+scriptings:
+  - schedule:
+      name: po1-fw-test
+      cron: "* * * * *"
+      script_url: https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/egern/po1-firewall-whitelist.js
+      timeout: 60
+      env:
+        tokens: "{{{tokens1}}}"
+  - network:
+      name: po1-fw-test-network
+      script_url: https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/egern/po1-firewall-whitelist.js
+      timeout: 60
+      env:
+        tokens: "{{{tokens1}}}"
