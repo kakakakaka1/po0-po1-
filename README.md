@@ -2,6 +2,8 @@
 
 在 [w0ven/po0fw](https://github.com/w0ven/po0fw) 的 po0 模块基础上，**新增一套 po1 加白**（腾讯云 ECS 白名单），两者互不干扰、各自独立配置。
 
+> 本仓库**不存放任何 token / 密钥**。token 只在 Surge 的模块参数里填，随本机配置保存，不会上传到这里。
+
 ## 安装
 
 ```
@@ -10,10 +12,10 @@ https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/surge/po0-po1-firewa
 
 安装后在模块设置里填两个参数（都可留空，留空的那套就不工作）：
 
-| 参数 | 说明 |
+| 参数 | 填什么 |
 |---|---|
-| `tokens` | po0 token，`pgnfw_` 开头；多台机器用英文逗号分隔；可写 `token@槽位` |
-| `tokens1` | po1 token，`ctecsfw_` 开头；同上，`token@槽位` 钉固定槽位 |
+| `tokens` | po0 的 token（`pgnfw_` 开头）。多台机器用英文逗号分隔。想钉死槽位就在 token 后面加 `@槽位号` |
+| `tokens1` | po1 的 token（`ctecsfw_` 开头）。写法同上，`@槽位号` 表示钉固定槽位 |
 
 ## 两套 API 的差异（实测）
 
@@ -30,8 +32,8 @@ po1 成功响应示例：
 
 ```json
 {"status":200,"msg":"固定槽位已更新为当前访问来源",
- "data":{"cidr":"140.250.150.226/32","action":"slot_pin","mode":"fixed","slot":4,
-         "changed":1,"matched_cidr":"140.250.150.226/32","matched_slot":null,
+ "data":{"cidr":"203.0.113.10/32","action":"slot_pin","mode":"fixed","slot":4,
+         "changed":1,"matched_cidr":"203.0.113.10/32","matched_slot":null,
          "removed_cidr":"","entry_policy":"single_ip","prefix_length":32}}
 ```
 
@@ -55,7 +57,7 @@ DOMAIN-SUFFIX,guguyun.com,DIRECT
 ## 面板
 
 - `po0 防火墙加白`：`#1 📌5 ✅ 1/6` + 白名单条目
-- `po1 防火墙加白`：`#1 📌4 ✅ 140.250.150.226/32 (slot 4) · 已在白名单`
+- `po1 防火墙加白`：`#1 📌4 ✅ 203.0.113.10/32 (slot 4) · 已在白名单`
 
 po1 接口不返回完整白名单列表（只有本次写入的那条），所以面板只显示当前出口 IP、槽位和本次动作（新增 / 顶替 / 已存在）。
 

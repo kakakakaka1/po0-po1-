@@ -22,7 +22,7 @@
  * 这里是单 IP 粒度，换 IP 就会占一个新条目。
  *
  * token 来源（优先级从高到低）：
- * 1. argument: tokens=<ctecsfw_xxx>[@槽位],<ctecsfw_yyy>（模块参数）
+ * 1. argument: tokens=<你的token>[@槽位],<另一个token>（模块参数）
  * 2. 持久化存储 key "po1fw_tokens"（Quantumult X 等不支持参数的客户端）
  * 3. 下面的 INLINE_TOKENS 常量
  */
