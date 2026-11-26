@@ -4,7 +4,7 @@
 #!author=reallinzc（po0）/ po1 扩展
 #!homepage=https://po0fw.uuuz.de/
 #!arguments=tokens:"",tokens1:""
-#!arguments-desc=tokens: po0 防火墙 API token（pgnfw_ 开头），多台机器用英文逗号 , 分割；可选 token@槽位（如 pgnfw_xxx@0）钉固定坑位、永不被淘汰 / tokens1: po1 白名单 token（ctecsfw_ 开头），多台机器用英文逗号 , 分割；可选 token@槽位（如 ctecsfw_xxx@4）钉固定槽位
+#!arguments-desc=tokens: po0 防火墙 API token（pgnfw_ 开头），多台机器用英文逗号分割；可选 token@槽位（如 pgnfw_xxx@0）钉固定坑位、永不被淘汰 / tokens1: po1 白名单 token（ctecsfw_ 开头），多台机器用英文逗号分割；可选 token@槽位（如 ctecsfw_xxx@4）钉固定槽位
 
 [Rule]
 # 加白 API 必须直连，确保服务端看到的是本机真实出口 IP，而不是代理出口
