@@ -1,13 +1,21 @@
-# po0 + po1 防火墙自动加白（Surge 模块）
+# po0 + po1 防火墙自动加白
 
 在 [w0ven/po0fw](https://github.com/w0ven/po0fw) 的 po0 模块基础上，**新增一套 po1 加白**（腾讯云 ECS 白名单），两者互不干扰、各自独立配置。
 
-> 本仓库**不存放任何 token / 密钥**。token 只在 Surge 的模块参数里填，随本机配置保存，不会上传到这里。
+> 本仓库**不存放任何 token / 密钥**。token 只在客户端的模块参数里填，随本机配置保存，不会上传到这里。
 
 ## 安装
 
+**Surge / Stash / Shadowrocket / Loon / Quantumult X**（.sgmodule）
+
 ```
 https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/surge/po0-po1-firewall-whitelist.sgmodule
+```
+
+**Egern**（.yaml）
+
+```
+https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/egern/po0-po1-firewall-whitelist.yaml
 ```
 
 安装后在模块设置里填两个参数（都可留空，留空的那套就不工作）：
@@ -16,6 +24,8 @@ https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/surge/po0-po1-firewa
 |---|---|
 | `tokens` | po0 的 token（`pgnfw_` 开头）。多台机器用英文逗号分隔。想钉死槽位就在 token 后面加 `@槽位号` |
 | `tokens1` | po1 的 token（`ctecsfw_` 开头）。写法同上，`@槽位号` 表示钉固定槽位 |
+
+> Egern 没有 Surge 那种面板，加白结果只体现在通知里；成功状态只在出口 IP / 槽位变化时弹一次，失败每次都弹。
 
 ## 两套 API 的差异（实测）
 
@@ -63,11 +73,16 @@ po1 接口不返回完整白名单列表（只有本次写入的那条），所�
 
 ## 文件
 
-- `surge/po0-po1-firewall-whitelist.sgmodule` — 模块本体，po0 部分直接引用上游脚本，不复制
-- `scripts/po1-firewall-whitelist.js` — po1 脚本，兼容 Surge / Stash / Shadowrocket / Loon / Quantumult X
+| 文件 | 说明 |
+|---|---|
+| `surge/po0-po1-firewall-whitelist.sgmodule` | Surge 系模块本体，po0 部分直接引用上游脚本，不复制 |
+| `scripts/po1-firewall-whitelist.js` | po1 脚本，兼容 Surge / Stash / Shadowrocket / Loon / Quantumult X |
+| `egern/po0-po1-firewall-whitelist.yaml` | Egern 模块，po0 同样引用上游 egern 脚本 |
+| `egern/po1-firewall-whitelist.js` | po1 的 Egern 原生脚本（`export default async (ctx)`，只用 `ctx.*` API） |
 
 ## 说明
 
 - po1 未配置 `tokens1` 时**静默退出**，不弹通知，避免只配了 po0 的人每 10 分钟被吵一次。
 - po1 是 GET 请求，天然幂等，失败（超时 / 5xx / 非 JSON 响应）会自动重试 3 次。
 - 槽位冲突（po0 返回 403 `IP is already pinned to another slot.`）属于服务端状态，脚本只报错不自动处理，需要去对应面板删掉旧槽位。
+- Egern 的 `ctx.http` 在非 2xx 时会直接 throw（不像 Surge 把 resp 交回来），所以 Egern 版脚本从 error message 里把 `status` / `body` 解析回来再统一处理。

@@ -1,0 +1,57 @@
+name: po0 + po1 防火墙自动加白
+description: 调用 po0 / po1 两套防火墙 API 把本机当前出口 IP 加入白名单。po0 支持多 token（英文逗号分割，一台机器一个），po1 为腾讯云 ECS 白名单分享链接（ctecsfw_ 开头），同样支持多 token。每 10 分钟 cron 与网络变化时自动加白，加白 API 走直连。可选在 token 后加 @槽位（如 @4）钉固定坑位、永不被淘汰。
+author: reallinzc（po0）/ po1 扩展
+homepage: https://po0fw.uuuz.de/
+icon: https://po0fw.uuuz.de/icons/po0fw.png
+
+# 安装后在模块参数里填 token —— 本文件与脚本均不含任何 token。
+#   tokens  po0 的 pgnfw_ token（多台机器用英文逗号分割）
+#   tokens1 po1 的 ctecsfw_ token（写法同上）
+# 两栏都可留空，留空的那套不工作；po1 留空时脚本静默退出，不会弹通知。
+# 可选：token 后加 @槽位（如 @4）把本机 IP 钉在该坑位、永不被淘汰。
+compat_arguments:
+  tokens: ""
+  tokens1: ""
+
+rules:
+  # 加白 API 必须直连，确保服务端看到的是本机真实出口 IP 而不是代理出口
+  # po0 的 API 是裸 IP，直接锁 IP-CIDR
+  - ip_cidr:
+      match: 124.221.69.228/32
+      policy: DIRECT
+      no_resolve: true
+  # po1 的 www.guguyun.com 是多 IP 的 CDN（实测 103.120.90.53 / 103.120.90.209 /
+  # 69.165.68.160），写死 IP-CIDR 会在解析到新节点后失效，所以用域名规则
+  - domain_suffix:
+      match: guguyun.com
+      policy: DIRECT
+
+scriptings:
+  # ---- po0（直接引用上游脚本，不复制）----
+  - schedule:
+      name: po0-fw-cron
+      cron: "*/10 * * * *"
+      script_url: https://raw.githubusercontent.com/w0ven/po0fw/main/egern/po0-firewall-whitelist.js
+      timeout: 60
+      env:
+        tokens: "{{{tokens}}}"
+  - network:
+      name: po0-fw-network
+      script_url: https://raw.githubusercontent.com/w0ven/po0fw/main/egern/po0-firewall-whitelist.js
+      timeout: 60
+      env:
+        tokens: "{{{tokens}}}"
+  # ---- po1 ----
+  - schedule:
+      name: po1-fw-cron
+      cron: "*/10 * * * *"
+      script_url: https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/egern/po1-firewall-whitelist.js
+      timeout: 60
+      env:
+        tokens: "{{{tokens1}}}"
+  - network:
+      name: po1-fw-network
+      script_url: https://raw.githubusercontent.com/kakakakaka1/po0-po1-/main/egern/po1-firewall-whitelist.js
+      timeout: 60
+      env:
+        tokens: "{{{tokens1}}}"
